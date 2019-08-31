@@ -1,0 +1,143 @@
+EJERCICIO 1
+Determinar cuales de los siguiente Identificadores son equivalentes en PL/SQL
+
+Identificador1 NUMBER;
+Identificador_1 NUMBER;
+identificador1 NUMBER;
+IdEntificador_1 NUMBER;
+IDENTIFICADOR1 NUMBER;
+
+Identificador1 = identificador1 = IDENTIFICADOR1
+Identificador_1 = IdEntificador_1
+
+EJERCICIO 2
+Determinar cual de los siguientes identificadores en PL/SQL es el válido:
+
+Primera variable VARCHAR2(40);
+MAL. Las variables no pueden tener espacios.
+end BOOLEAN;
+MAL. end es una palabra reservada.
+Una_variable VARCHAR2(40);
+BIEN.
+Otra-variable VARCHAR2(40);
+MAL. Las variables no pueden contener guiones.
+
+EJERCICIO 3
+¿ Funcionaría la siguiente sentencia en PL/SQL?. En caso negativo proponer como resolverlo.
+
+DECLARE
+    nombre VARCHAR2(80);
+    direccion VARCHAR2(80);
+    tipo empleado VARCHAR2(4);
+BEGIN
+    SELECT name, address, type
+    INTO nombre, direccion, tipo empleado
+    FROM emp;
+END;
+
+No funcionaría. La variable "tipo empleado" tiene un espacio.
+Se resolvería sustituyendo el espacio por "_" -> tipo_empleado.
+
+EJERCICIO 5
+Indicar del siguiente juego de declaraciones, cuales son correctas y cuales no, indicando además por qué no son correctas.
+
+DECLARE
+cierto BOOLEAN:=FALSE;
+BIEN.
+id_externo NUMBER(4) NOT NULL;
+MAL. La variable es no nula y no se le asigna ningún valor
+cosa NUMBER:=2;
+BIEN.
+producto NUMBER:=2*cosa;
+BIEN.
+suma NUMBER:=cosa + la_otra;
+MAL. la_otra aún no se ha declarado
+la_otra NUMBER:=2;
+BIEN.
+tipo_uno NUMBER(7,2) NOT NULL:=3;
+BIEN.
+tipo_otro tipo_uno%TYPE;
+MAL. Será no nula y no le estamos dando valor.
+
+EJERCICIO 6
+Suponiendo que tenemos una tabla llamada EMP, en la cual
+existen tres campos: nombre VARCHAR2(40), direccion
+VARCHAR2(255), telefono NUMBER(10)... ¿Qué valores podrán
+tomar las variables que definimos en la siguiente declaración?
+
+DECLARE
+    valor1 emp%ROWTYPE;
+    valor2 emp.nombre%TYPE;
+    valor3 emp.telefono%TYPE;
+CURSOR c1 IS
+SELECT nombre,direccion FROM emp;
+    valor4 c1%ROWTYPE;
+    valor5 emp%ROWTYPE;
+
+valor1 podrá tomar tres valores con el mismo tipo que las columnas de EMP, un VARCHAR2(40), un VARCHAR2(255) y NUMBER(10).
+valor2 podrá ser un VARCHAR2(40).
+valor3 podrá ser un NUMBER(10).
+c1 podrá contener un VARCHAR2(40) y un VARCHAR2(255).
+valor4 podrá contener el mismo tipo que c1, un VARCHAR2(40) y un VARCHAR2(255).
+valor5 podrá contener el mismo tipo que emp, un VARCHAR2(40), un VARCHAR2(255) y un NUMBER(10).
+
+EJERCICIO 7
+En base al enunciado anterior, ¿Sería correcta la siguiente asignación?
+valor1:=valor5;
+
+CORRECTO. Las dos variables tienen los mismos tipos de datos.
+
+¿y esta?
+valor4:=valor1;
+
+INCORRECTO. valor4 tiene 2 columnas y valor1 tiene 3.
+
+EJERCICIO 8
+¿ Es esta declaración correcta en PL/SQL?
+DECLARE
+i, j NUMBER;
+
+No. Se deben declarar las variables de 1 en 1.
+
+¿Y si la escribieramos así?
+DECLARE
+i, j NUMBER, NUMBER;
+
+Tampoco.
+
+EJERCICIO 9
+Escribir un bloque PL/SQL que escriba el texto “Hola”.
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Hola');
+END;
+
+EJERCICIO 10
+Escribe un bloque PL/SQL que sume dos número y te diga que números ha sumado y cuál es el resultado.
+
+DECLARE
+    X NUMBER:=5;
+    Y NUMBER:=11;
+    SUMA NUMBER;
+BEGIN
+    SUMA := X + Y;
+    DBMS_OUTPUT.PUT_LINE(X || ' + ' || Y || ' = ' || SUMA);
+END;
+
+EJERCICIO 11
+Escribe un bloque PL/SQL donde declares una variable, inicializada a la fecha actual, que imprimes por pantalla.
+
+DECLARE
+    FECHA DATE:=SYSDATE;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(FECHA);
+END;
+
+EJERCICIO 12
+Escribe un boque PL/SQL que almacene en una variable numérica el año actual. Muestra por pantalla el año. Puedes usar las funciones to_number y to_char.
+
+DECLARE
+    ANYO VARCHAR2(4):=TO_CHAR(SYSDATE, 'YYYY');
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(ANYO);
+END;
