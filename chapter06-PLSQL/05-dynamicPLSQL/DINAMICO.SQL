@@ -1,0 +1,242 @@
+-- Adrián Navarro Gabino
+
+
+-- EJERCICIO 1 Y 2
+
+-- Crea un procedimiento que dado un nombre y una
+-- contraseña te cree un usuario y te de permisos.
+
+-- Cambia el ejercicio anterior capturando todos los
+-- fallos posibles que se puedan dar.
+
+CREATE OR REPLACE PROCEDURE INSERTAR_USUARIO (USER VARCHAR2, PASS VARCHAR2)
+AS
+    SQL_STR VARCHAR2(1000);
+BEGIN
+    SQL_STR := 'CREATE USER "'||USER||'" IDENTIFIED BY "'||PASS||'"';
+    EXECUTE IMMEDIATE SQL_STR;
+    SQL_STR := 'GRANT ALL PRIVILEGES TO "'||USER||'"';
+    EXECUTE IMMEDIATE SQL_STR;
+END;
+
+DECLARE
+BEGIN
+    INSERTAR_USUARIO('USUARIO_PRUEBA', '1234');
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE_APPLICATION_ERROR(-20100, 'ERROR '||SQLERRM);
+END;
+
+-- EJERCICIO 3
+
+-- Crea dinámicamente un tabla de 5 campos, y creale
+-- una clave primaria.
+
+CREATE OR REPLACE PROCEDURE CREAR_TABLA 
+(NOMBRE VARCHAR2, PK VARCHAR2, TIPO1 VARCHAR2, CAMPO2 VARCHAR2, TIPO2 VARCHAR2,
+CAMPO3 VARCHAR2, TIPO3 VARCHAR2, CAMPO4 VARCHAR2, TIPO4 VARCHAR2,
+CAMPO5 VARCHAR2, TIPO5 VARCHAR2)
+AS
+    SQL_STR VARCHAR2(1000);
+BEGIN
+    SQL_STR := 'CREATE TABLE '||NOMBRE||' ( '||PK||' '||TIPO1||' PRIMARY KEY, '||
+    CAMPO2||' '||TIPO2||', '||CAMPO3||' '||TIPO3||', '||CAMPO4||' '||TIPO4||', '||
+    CAMPO5||' '||TIPO5||')';
+    EXECUTE IMMEDIATE SQL_STR;
+END;
+
+DECLARE
+    NOMBRE VARCHAR2(20):='TRABAJADORES';
+    PK VARCHAR2(20):='NOMBRE';
+    CAMPO2 VARCHAR2(20):='APELLIDOS';
+    CAMPO3 VARCHAR2(20):='PUESTO';
+    CAMPO4 VARCHAR2(20):='SUELDO';
+    CAMPO5 VARCHAR2(20):='FECHA_COMIENZO';
+    TIPO1 VARCHAR2(20):='VARCHAR2(20)';
+    TIPO2 VARCHAR2(20):='VARCHAR2(50)';
+    TIPO3 VARCHAR2(20):='VARCHAR2(20)';
+    TIPO4 VARCHAR2(20):='NUMBER';
+    TIPO5 VARCHAR2(20):='DATE';
+BEGIN
+    CREAR_TABLA(NOMBRE,PK,TIPO1,CAMPO2,TIPO2,CAMPO3,TIPO3,CAMPO4,TIPO4,CAMPO5,TIPO5);
+END;
+
+-- EJERCICIO 4
+
+-- Realiza un procedimiento llamado Busqueda, que
+-- entren por parámetros los 5 campos dados y busque
+-- dinámicamente todos los datos de la tabla anterior
+-- por todo los criterios que no se le pase a NULL a la
+-- función, dando un error si todos se pasan a NULL.
+
+CREATE OR REPLACE PROCEDURE BUSQUEDA 
+(NOMBRE_TABLA VARCHAR2, CAMPO1 VARCHAR2, RES1 VARCHAR2, CAMPO2 VARCHAR2,
+RES2 VARCHAR2, CAMPO3 VARCHAR2, RES3 VARCHAR2, CAMPO4 VARCHAR2, RES4 VARCHAR2,
+CAMPO5 VARCHAR2, RES5 VARCHAR2)
+AS
+    SQL_STR VARCHAR2(1000);
+    VALOR_INTRODUCIDO BOOLEAN := FALSE;
+    EXCEPCION_NULL EXCEPTION;
+BEGIN
+    IF NOMBRE_TABLA IS NULL OR (RES1 IS NULL AND
+            RES2 IS NULL AND RES3 IS NULL AND RES4 IS NULL AND
+            RES5 IS NULL) THEN
+        RAISE EXCEPCION_NULL;
+    END IF;
+    
+    SQL_STR := 'SELECT * FROM '||NOMBRE_TABLA||' WHERE'||CAMPO1||' = '''||RES1;
+    
+    IF RES1 IS NOT NULL THEN
+        IF VALOR_INTRODUCIDO = TRUE THEN
+            SQL_STR := SQL_STR||', '||CAMPO1||' = '||RES1;
+        ELSE
+            SQL_STR := SQL_STR||' '||CAMPO1||' = '||RES1;
+        END IF;
+        VALOR_INTRODUCIDO := TRUE;
+    END IF;
+    
+    IF RES2 IS NOT NULL THEN
+        IF VALOR_INTRODUCIDO = TRUE THEN
+            SQL_STR := SQL_STR||', '||CAMPO2||' = '||RES2;
+        ELSE
+            SQL_STR := SQL_STR||' '||CAMPO2||' = '||RES2;
+        END IF;
+        VALOR_INTRODUCIDO := TRUE;
+    END IF;
+    
+    IF RES3 IS NOT NULL THEN
+        IF VALOR_INTRODUCIDO = TRUE THEN
+            SQL_STR := SQL_STR||', '||CAMPO3||' = '||RES3;
+        ELSE
+            SQL_STR := SQL_STR||' '||CAMPO3||' = '||RES3;
+        END IF;
+        VALOR_INTRODUCIDO := TRUE;
+    END IF;
+    
+    IF RES4 IS NOT NULL THEN
+        IF VALOR_INTRODUCIDO = TRUE THEN
+            SQL_STR := SQL_STR||', '||CAMPO4||' = '||RES4;
+        ELSE
+            SQL_STR := SQL_STR||' '||CAMPO4||' = '||RES4;
+        END IF;
+        VALOR_INTRODUCIDO := TRUE;
+    END IF;
+    
+    IF RES5 IS NOT NULL THEN
+        IF VALOR_INTRODUCIDO = TRUE THEN
+            SQL_STR := SQL_STR||', '||CAMPO5||' = '||RES5;
+        ELSE
+            SQL_STR := SQL_STR||' '||CAMPO5||' = '||RES5;
+        END IF;
+        VALOR_INTRODUCIDO := TRUE;
+    END IF;
+    
+    EXECUTE IMMEDIATE SQL_STR;
+    
+    EXCEPTION
+        WHEN EXCEPCION_NULL THEN
+            RAISE_APPLICATION_ERROR(-20101, 'LOS VALORES NO PUEDEN SER NULOS');
+END;
+
+-- EJERCICIO 5
+
+-- Crea la tabla usando SQL dinámico y EXECUTE IMMEDIATE
+-- dentro de un bloque PL/SQL. Comprueba que efectivamente la
+-- tabla fue creada, con una consulta simple sobre el catalogo de
+-- Oracle. Finalmente, elimina (DROP) la tabla.
+
+DECLARE
+    NOMBRE_TABLA VARCHAR2(30) := 'TABLA';
+    CAMPO1 VARCHAR2(10) := 'CAMPO1';
+    TIPO1 VARCHAR2(15) := 'VARCHAR2(10)';
+    CAMPO2 VARCHAR2(10) := 'CAMPO2';
+    TIPO2 VARCHAR2(15) := 'VARCHAR2(10)';
+    TABLA ALL_CATALOG%ROWTYPE;
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE TABLE '||NOMBRE_TABLA||' ( '||CAMPO1||' '||TIPO1||
+        ' PRIMARY KEY, '||CAMPO2||' '||TIPO2||' )';
+    
+    EXECUTE IMMEDIATE 'SELECT * FROM ALL_CATALOG WHERE TABLE_NAME = '''||
+    NOMBRE_TABLA||'''' INTO TABLA;
+    
+    DBMS_OUTPUT.PUT_LINE('TABLA: '||TABLA.TABLE_NAME);
+    
+    EXECUTE IMMEDIATE 'DROP TABLE '||NOMBRE_TABLA;
+END;
+
+-- EJERCICIO 6
+
+-- De nuevo en un bloque PL/SQL, crea una tabla T2 con un
+-- campo S alfanumerico, e inserta una fila en esa tabla.
+
+CREATE OR REPLACE PROCEDURE CREAR_T2 (PK VARCHAR2, CAMPO2 VARCHAR2,
+    PK_INTRODUCIR VARCHAR2, CAMPO2_INTRODUCIR VARCHAR2)
+AS
+    SQL_STR VARCHAR2(1000);
+BEGIN
+    SQL_STR := 'CREATE TABLE T2 ('||PK||' VARCHAR2(50) PRIMARY KEY, '||
+    CAMPO2||' VARCHAR2(50))';
+    EXECUTE IMMEDIATE SQL_STR;
+    
+    SQL_STR := 'INSERT INTO T2 ('||PK||', '||CAMPO2||') VALUES ('''||PK_INTRODUCIR||
+        ''', '''||CAMPO2_INTRODUCIR||''')';
+    EXECUTE IMMEDIATE SQL_STR;
+END;
+
+DECLARE
+    PK VARCHAR2(20) := 'PK';
+    CAMPO2 VARCHAR2(20) := 'CAMPO';
+    PK_INTRODUCIR VARCHAR2(50) := 'AAAA';
+    CAMPO2_INTRODUCIR VARCHAR2(50) := 'BBBB';
+BEGIN
+    CREAR_T2(PK, CAMPO2, PK_INTRODUCIR, CAMPO2_INTRODUCIR);
+END;
+
+-- EJERCICIO 7
+
+-- Recupera e imprime de nuevo los datos de todos los
+-- productos, ahora usando SQL dinámico.
+
+DECLARE
+    NOMBRE_TABLA VARCHAR2(15) := 'PRODUCTOS';
+    SQL_CADE VARCHAR2(1000);
+    CAMPO1_REG VARCHAR2(20) := 'NOMPROD';
+BEGIN
+    SQL_CADE:='
+    DECLARE
+        SQL_STR VARCHAR2(1000);
+        REG '||NOMBRE_TABLA||'%ROWTYPE;
+        CURSOR C_PRODUCTOS IS
+        SELECT * FROM '||NOMBRE_TABLA||';
+    BEGIN
+        FOR REG IN C_PRODUCTOS LOOP
+            DBMS_OUTPUT.PUT_LINE(REG.'||CAMPO1_REG||');
+        END LOOP;
+    END;';
+    
+    EXECUTE IMMEDIATE SQL_CADE;
+END;
+
+-- EJERCICIO 8
+
+-- Altera la tabla de productos, añadiendo una restricción
+-- c_precio_positivo que compruebe que el precio de un producto
+-- es mayor que cero.
+
+CREATE OR REPLACE PROCEDURE ANYADIR_RESTRICCION (NOMBRE_TABLA VARCHAR2,
+    NOMBRE_RESTRICCION VARCHAR2, RESTRICCION VARCHAR2)
+AS
+    SQL_STR VARCHAR2(1000);
+BEGIN
+    SQL_STR := 'ALTER TABLE '||NOMBRE_TABLA||' ADD ( CONSTRAINT '||
+        NOMBRE_RESTRICCION||' CHECK ('||RESTRICCION||') )';
+    EXECUTE IMMEDIATE SQL_STR;
+END;
+
+DECLARE
+    NOMBRE_TABLA VARCHAR2(20) := 'PRODUCTOS';
+    NOMBRE_RESTRICCION VARCHAR2(20) := 'C_PRECIO_POSITIVO';
+    RESTRICCION VARCHAR2(50) := 'PRECIO > 0';
+BEGIN
+    ANYADIR_RESTRICCION(NOMBRE_TABLA, NOMBRE_RESTRICCION, RESTRICCION);
+END;
